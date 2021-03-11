@@ -37,11 +37,7 @@ class FriendsList extends React.Component {
   }
 
   searchItem() {
-    const usersPerPage = 4;
-    const lastUser = this.state.activePage * usersPerPage;
-    const firstUser = lastUser - usersPerPage;
-    let arr = this.state.items.slice(firstUser, lastUser);
-    const shitem = arr.filter((val) =>
+    const shitem = this.state.items.filter((val) =>
       val["text"]
         .toLowerCase()
         .includes(this.state.currentItem.text.toLowerCase())
@@ -97,7 +93,7 @@ class FriendsList extends React.Component {
     const displayFriends = this.state.filterflag
       ? this.state.sitem
       : this.state.items.slice(firstUser, lastUser);
-    // const displayFriends = this.state.items.slice(firstUser, lastUser);
+
 
     return (
       <div className="content mx-auto mt-5">
