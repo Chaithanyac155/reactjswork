@@ -20,6 +20,7 @@ class FriendsList extends React.Component {
     this.handleInput = this.handleInput.bind(this);
     this.deleteItem = this.deleteItem.bind(this);
     this.favouriteItem = this.favouriteItem.bind(this);
+    this.isCompare = this.isCompare.bind(this);
   }
 
   addItem(e) {
@@ -27,7 +28,6 @@ class FriendsList extends React.Component {
     const newItem = this.state.currentItem;
     if (newItem.text !== "") {
       const items = [...this.state.items, newItem];
-
       this.setState({
         items: items,
         currentItem: {
@@ -68,8 +68,12 @@ class FriendsList extends React.Component {
         const filteredItems = this.state.sitem.filter(
           (item, ind) => ind !== index
         );
+        let deletedItem = this.state.sitem.filter((item, ind) => ind === index);
+        console.log(deletedItem);
+        let final = this.isCompare(this.state.items, deletedItem);
         this.setState({
-          sitem: filteredItems
+          sitem: filteredItems,
+          items: final
         });
       }
     } else {
@@ -83,6 +87,19 @@ class FriendsList extends React.Component {
       }
     }
   }
+  isCompare(frndList, searchList) {
+    let names = [];
+    for (let i = 0; i < frndList.length; i++) {
+      for (let j = 0; j < searchList.length; j++) {
+        if (
+          frndList[i].text.toLowerCase() !== searchList[j].text.toLowerCase()
+        ) {
+          names.push(frndList[i]);
+        }
+      }
+    }
+    return names;
+  }
 
   favouriteItem(item, toggle) {
     if (this.state.filterflag) {
@@ -93,8 +110,11 @@ class FriendsList extends React.Component {
       const Notfav = ToggleItems.filter((item, ind) => item.flag === false);
       let Re_Arranged = [];
       Re_Arranged = [...favItem, ...Notfav];
+      let duplicate = this.isCompare(this.state.items, Re_Arranged);
+      let favourite = [...Re_Arranged, ...duplicate];
       this.setState({
-        sitem: [...Re_Arranged]
+        sitem: [...Re_Arranged],
+        items: favourite
       });
     } else {
       let ToggleItems = this.state.items.map((val, ind) =>
