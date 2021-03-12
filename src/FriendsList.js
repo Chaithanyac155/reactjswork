@@ -12,7 +12,8 @@ class FriendsList extends React.Component {
       },
       sitem: [],
       filterflag: false,
-      activePage: 1
+      activePage: 1,
+      usersPerPage: 4
     };
     this.addItem = this.addItem.bind(this);
     this.searchItem = this.searchItem.bind(this);
@@ -26,12 +27,14 @@ class FriendsList extends React.Component {
     const newItem = this.state.currentItem;
     if (newItem.text !== "") {
       const items = [...this.state.items, newItem];
+
       this.setState({
         items: items,
         currentItem: {
           text: "",
           flag: false
-        }
+        },
+        activePage: Math.ceil(items.length / this.state.usersPerPage)
       });
     }
   }
@@ -42,9 +45,10 @@ class FriendsList extends React.Component {
         .toLowerCase()
         .includes(this.state.currentItem.text.toLowerCase())
     );
+
     this.setState({
-      filterflag: true,
-      sitem: shitem
+      sitem: shitem,
+      filterflag: true
     });
   }
 
@@ -59,27 +63,51 @@ class FriendsList extends React.Component {
   }
 
   deleteItem(index) {
-    if (window.confirm("Do you want to delete it")) {
-      const filteredItems = this.state.items.filter(
-        (item, ind) => ind !== index
-      );
-      this.setState({
-        items: filteredItems
-      });
+    if (this.state.filterflag) {
+      if (window.confirm("Do you want to delete it")) {
+        const filteredItems = this.state.sitem.filter(
+          (item, ind) => ind !== index
+        );
+        this.setState({
+          sitem: filteredItems
+        });
+      }
+    } else {
+      if (window.confirm("Do you want to delete it")) {
+        const filteredItems = this.state.items.filter(
+          (item, ind) => ind !== index
+        );
+        this.setState({
+          items: filteredItems
+        });
+      }
     }
   }
 
-  favouriteItem(index, toggle) {
-    let ToggleItems = this.state.items.map((item, ind) =>
-      ind === index ? { ...item, flag: toggle } : item
-    );
-    const favItem = ToggleItems.filter((item, ind) => item.flag === true);
-    const Notfav = ToggleItems.filter((item, ind) => item.flag === false);
-    let Re_Arranged = [];
-    Re_Arranged = [...favItem, ...Notfav];
-    this.setState({
-      items: [...Re_Arranged]
-    });
+  favouriteItem(item, toggle) {
+    if (this.state.filterflag) {
+      let ToggleItems = this.state.sitem.map((val, ind) =>
+        val === item ? { ...val, flag: toggle } : val
+      );
+      const favItem = ToggleItems.filter((item, ind) => item.flag === true);
+      const Notfav = ToggleItems.filter((item, ind) => item.flag === false);
+      let Re_Arranged = [];
+      Re_Arranged = [...favItem, ...Notfav];
+      this.setState({
+        sitem: [...Re_Arranged]
+      });
+    } else {
+      let ToggleItems = this.state.items.map((val, ind) =>
+        val === item ? { ...val, flag: toggle } : val
+      );
+      const favItem = ToggleItems.filter((item, ind) => item.flag === true);
+      const Notfav = ToggleItems.filter((item, ind) => item.flag === false);
+      let Re_Arranged = [];
+      Re_Arranged = [...favItem, ...Notfav];
+      this.setState({
+        items: [...Re_Arranged]
+      });
+    }
   }
 
   handleSetChange(pageNumber) {
@@ -87,13 +115,11 @@ class FriendsList extends React.Component {
   }
 
   render() {
-    const usersPerPage = 4;
-    const lastUser = this.state.activePage * usersPerPage;
-    const firstUser = lastUser - usersPerPage;
+    const lastUser = this.state.activePage * this.state.usersPerPage;
+    const firstUser = lastUser - this.state.usersPerPage;
     const displayFriends = this.state.filterflag
       ? this.state.sitem
       : this.state.items.slice(firstUser, lastUser);
-
 
     return (
       <div className="content mx-auto mt-5">
@@ -133,7 +159,7 @@ class FriendsList extends React.Component {
                         <span
                           className="material-icons"
                           onClick={() => {
-                            this.favouriteItem(index, false);
+                            this.favouriteItem(item, false);
                           }}
                         >
                           star
@@ -142,7 +168,7 @@ class FriendsList extends React.Component {
                         <span
                           className="material-icons"
                           onClick={() => {
-                            this.favouriteItem(index, true);
+                            this.favouriteItem(item, true);
                           }}
                         >
                           star_outline
